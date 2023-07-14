@@ -6,14 +6,11 @@ import streamlit as st
 from bs4 import BeautifulSoup
 from streamlit_lottie import st_lottie
 
-
-# Set page configuration
 st.set_page_config(
     page_title='Wuzzuf Job Scraper',
     layout='wide',    
     initial_sidebar_state='auto',    
 )
-
 st.markdown("""
     <style>
         .title {
@@ -59,7 +56,6 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
-
 st.markdown("""
     <div class='title'>
         Wuzzuf Job Scraper
@@ -67,7 +63,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-line = st.markdown("<hr class='line'>", unsafe_allow_html=True)
+st.markdown("<hr class='line clicked'>", unsafe_allow_html=True)
 
 def scrape_jobs(job_title, num_pages):
     with open('Jobs.csv', 'w', encoding='utf-8', newline='') as file:
@@ -113,70 +109,63 @@ with st.container():
     with left :
         st.header("Hi:wave:, I'm Ahmed Kamel")
         st.subheader("I'm Data Scientist")
-        st.write('---')
+        def load(li):
+            r=requests.get(li)
+            if r.status_code !=200:
+                return None
+            return r.json()
 
+        loo=load('https://assets8.lottiefiles.com/packages/lf20_x1ikbkcj.json')
+        st_lottie(loo,height=250,key="coding")
+
+        st.write('---')
+        
         st.markdown("""
         * ##### This application searches for your job through Wuzzuf website, so you can find a job in a short time and easily.
         ---
+        
         * ##### To find your jobs, follow these steps:
-            <ul> <li> Enter your job title. </li> </ul>
-            <ul> <li> Enter number of pages that contain your job. </li> </ul>
-            <ul> <li> Click on find jobs button and wait for the results. </li> </ul>
-      """, unsafe_allow_html=True)
-    def load(li):
-        r=requests.get(li)
-        if r.status_code !=200:
-            return None
-        return r.json()
+            <ul> <li> Enter your job title</li> </ul>
+            <ul> <li>Enter the number of pages to scrape.</li> </ul>
+            <ul><li>Click on the "Search Jobs" button.</li> </ul>
+            <ul><li>Download the scraped data by clicking on the "Download CSV" button.</li> </ul>
+            <ul><li>View the scraped data and job distribution visualizations.</li> </ul>
+        ---
+        """, unsafe_allow_html=True)
+        
+        st.write('* ##### Watch a video on how the app works:')
+        st.video('video.mp4')
+       
+        
+    with right:
+        st.header('Search Jobs')
+        job_title = st.text_input('Enter Job Title')
+        num_pages = st.number_input('Enter Number of Pages', min_value=1, max_value=100, value=1, step=1)
 
-    loo=load('https://assets8.lottiefiles.com/packages/lf20_x1ikbkcj.json')
-    st.markdown("* ##### Here is a video that shows you how it work:")
+        if st.button('Search Jobs'):
+            with st.spinner('Searching for jobs...'):
+                scrape_jobs(job_title, num_pages)
+            st.success('Jobs scraped successfully!')
 
-    st.video('video.mp4')
+            # Read the CSV file and display the data in a table
+            df = pd.read_csv('Jobs.csv')
+            st.write('## Jobs Found')
+            st.dataframe(df)
 
-    with right :
-        st_lottie(loo,height=250,key="coding")
-    st.write('---')
+            st.download_button(label='Download Data', data=df.to_csv(index=False), file_name='Jobs.csv', mime='text/csv')
+        
+            # Create visualizations of job type, level, experience, and city distribution
+            st.write('## Job Distribution')
+            fig1 = px.pie(df, names='Job Type', title='Job Type Distribution')
+            st.plotly_chart(fig1)
 
-# Set up user input form
-with st.form(key='job_search_form'):
-    job_title = st.text_input('Job Title')
-    num_pages = st.slider('Number of Pages to Scrape', min_value=1, max_value=100, step=1)
-    submit_button = st.form_submit_button(label='Find Jobs🔎')
+            fig2 = px.pie(df, names='Job Level', title='Job Level Distribution')
+            st.plotly_chart(fig2)
 
-# Scrape jobs and display results
-if submit_button:
-    with st.spinner('Scraping Jobs...'):
-        scrape_jobs(job_title, num_pages)
-    st.success('Scraping complete!', icon='✅')
+            fig3 = px.pie(df, names='Experience', title='Experience Distribution')
+            st.plotly_chart(fig3)
 
-    df = pd.read_csv('Jobs.csv')
-    pd.set_option('display.max_colwidth', None)
+            fig4 = px.bar(df, x='City', title='City Distribution', width=800 )
+            st.plotly_chart(fig4)
 
-    st.header('Scraped Data')
-    st.table(df)
-    st.write('---')
-    st.write("##### After finding your jobs, there is some statistical information about your job that helps you know the skills or requirements required for the job.")
-    # Plot job type, level, experience using pie charts
-    try:
-        job_type_counts = df['Job Type'].value_counts()
-        fig1 = px.pie(job_type_counts, names=job_type_counts.index, values=job_type_counts.values, title='Job Type Distribution')
-        st.plotly_chart(fig1)
-
-        job_level_counts = df['Job Level'].value_counts()
-        fig2 = px.pie(job_level_counts, names=job_level_counts.index, values=job_level_counts.values, title='Job Level Distribution')
-        st.plotly_chart(fig2)
-
-        exp_counts = df['Experience'].value_counts()
-        fig3 = px.pie(exp_counts, names=exp_counts.index, values=exp_counts.values, title='Experience Distribution')
-        st.plotly_chart(fig3)
-
-        # Plot city distribution using bar chart
-        city_counts = df['City'].value_counts()
-        fig4 = px.bar(city_counts, x=city_counts.index, y=city_counts.values, title='City Distribution')
-        st.plotly_chart(fig4)  
-        st.write('---')
-
-    except:
-        st.warning('No data available for visualization.',icon="⚠️")
 
