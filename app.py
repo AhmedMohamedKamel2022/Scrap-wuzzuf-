@@ -10,10 +10,8 @@ from streamlit_lottie import st_lottie
 # Set page configuration
 st.set_page_config(
     page_title='Wuzzuf Job Scraper',
-    layout='wide',
-    initial_sidebar_state="collapsed",    
-
-        
+    layout='wide',    
+    initial_sidebar_state='auto',    
 )
 
 st.markdown("""
@@ -57,50 +55,6 @@ st.markdown("""
             }
             100% {
                 transform: scale(1);
-            }
-        }
-
-        /* Responsive styles */
-        @media screen and (max-width: 767px) {
-            .title {
-                font-size: 2rem;
-                padding: 10px;
-            }
-            .title:hover {
-                background-color: #2f4f4f;
-            }
-            .line {
-                margin: 20px 0;
-            }
-        }
-
-        @media screen and (min-width: 768px) and (max-width: 991px) {
-            .title {
-                font-size: 2.5rem;
-                padding: 15px;
-            }
-            .line {
-                margin: 25px 0;
-            }
-        }
-
-        @media screen and (min-width: 992px) and (max-width: 1199px) {
-            .title {
-                font-size: 2.8rem;
-                padding: 18px;
-            }
-            .line {
-                margin: 28px 0;
-            }
-        }
-
-        @media screen and (min-width: 1200px) {
-            .title {
-                font-size: 3rem;
-                padding: 20px;
-            }
-            .line {
-                margin: 30px 0;
             }
         }
     </style>
