@@ -10,7 +10,10 @@ from streamlit_lottie import st_lottie
 # Set page configuration
 st.set_page_config(
     page_title='Wuzzuf Job Scraper',
-    layout='wide',    
+    layout='wide',
+    initial_sidebar_state="expanded",    
+
+        
 )
 
 st.markdown("""
